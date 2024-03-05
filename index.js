@@ -90,6 +90,10 @@ async function run() {
     const count = core.getInput('count', { required: true });
     const startedBy = core.getInput('started-by', { required: false }) || agent;
     const waitForFinish = core.getInput('wait-for-finish', { required: false }) || false;
+    const subnets = core.getMultilineInput("subnets", { required: true });
+    const securityGroups = core.getMultilineInput("security-groups", {
+      required: true,
+    });
     let waitForMinutes = parseInt(core.getInput('wait-for-minutes', { required: false })) || 30;
     if (waitForMinutes > MAX_WAIT_MINUTES) {
       waitForMinutes = MAX_WAIT_MINUTES;
@@ -128,7 +132,15 @@ async function run() {
       cluster: clusterName,
       taskDefinition: taskDefArn,
       count: count,
-      startedBy: startedBy
+      startedBy: startedBy,
+      launchType: "FARGATE",
+      networkConfiguration: {
+        awsvpcConfiguration: {
+          subnets,
+          assignPublicIp,
+          securityGroups,
+        },
+      },
     }).promise();
 
     core.debug(`Run task response ${JSON.stringify(runTaskResponse)}`)
