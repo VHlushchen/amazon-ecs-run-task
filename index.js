@@ -102,119 +102,119 @@ async function run() {
 
     // Register the task definition
     core.setOutput(subnets)
-//     core.debug('Registering the task definition');
-//     const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
-//       taskDefinitionFile :
-//       path.join(process.env.GITHUB_WORKSPACE, taskDefinitionFile);
-//     const fileContents = fs.readFileSync(taskDefPath, 'utf8');
-//     const taskDefContents = removeIgnoredAttributes(cleanNullKeys(yaml.parse(fileContents)));
+    core.debug('Registering the task definition');
+    const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
+      taskDefinitionFile :
+      path.join(process.env.GITHUB_WORKSPACE, taskDefinitionFile);
+    const fileContents = fs.readFileSync(taskDefPath, 'utf8');
+    const taskDefContents = removeIgnoredAttributes(cleanNullKeys(yaml.parse(fileContents)));
 
-//     let registerResponse;
-//     try {
-//       registerResponse = await ecs.registerTaskDefinition(taskDefContents).promise();
-//     } catch (error) {
-//       core.setFailed("Failed to register task definition in ECS: " + error.message);
-//       core.debug("Task definition contents:");
-//       core.debug(JSON.stringify(taskDefContents, undefined, 4));
-//       throw(error);
-//     }
-//     const taskDefArn = registerResponse.taskDefinition.taskDefinitionArn;
-//     core.setOutput('task-definition-arn', taskDefArn);
+    let registerResponse;
+    try {
+      registerResponse = await ecs.registerTaskDefinition(taskDefContents).promise();
+    } catch (error) {
+      core.setFailed("Failed to register task definition in ECS: " + error.message);
+      core.debug("Task definition contents:");
+      core.debug(JSON.stringify(taskDefContents, undefined, 4));
+      throw(error);
+    }
+    const taskDefArn = registerResponse.taskDefinition.taskDefinitionArn;
+    core.setOutput('task-definition-arn', taskDefArn);
 
-//     const clusterName = cluster ? cluster : 'default';
-//     core.debug(`Running task with ${JSON.stringify({
+    const clusterName = cluster ? cluster : 'default';
+    core.debug(`Running task with ${JSON.stringify({
 
-//       cluster: clusterName,
-//       taskDefinition: taskDefArn,
-//       count: count,
-//       startedBy: startedBy
-//     })}`)
+      cluster: clusterName,
+      taskDefinition: taskDefArn,
+      count: count,
+      startedBy: startedBy
+    })}`)
 
-//     const runTaskResponse = await ecs.runTask({
-//       cluster: clusterName,
-//       taskDefinition: taskDefArn,
-//       count: count,
-//       launchType: "FARGATE",
-//       networkConfiguration: {
-//         awsvpcConfiguration: {
-//           subnets: subnets,
-//           assignPublicIp: assignPublicIp,
-//           securityGroups: securityGroups,
-//         },
-//       },
-//     }).promise();
+    const runTaskResponse = await ecs.runTask({
+      cluster: clusterName,
+      taskDefinition: taskDefArn,
+      count: count,
+      launchType: "FARGATE",
+      networkConfiguration: {
+        awsvpcConfiguration: {
+          subnets: subnets,
+          assignPublicIp: assignPublicIp,
+          securityGroups: securityGroups,
+        },
+      },
+    }).promise();
 
-//     core.debug(`Run task response ${JSON.stringify(runTaskResponse)}`)
+    core.debug(`Run task response ${JSON.stringify(runTaskResponse)}`)
 
-//     if (runTaskResponse.failures && runTaskResponse.failures.length > 0) {
-//       const failure = runTaskResponse.failures[0];
-//       throw new Error(`${failure.arn} is ${failure.reason}`);
-//     }
+    if (runTaskResponse.failures && runTaskResponse.failures.length > 0) {
+      const failure = runTaskResponse.failures[0];
+      throw new Error(`${failure.arn} is ${failure.reason}`);
+    }
 
-//     const taskArns = runTaskResponse.tasks.map(task => task.taskArn);
+    const taskArns = runTaskResponse.tasks.map(task => task.taskArn);
 
-//     core.setOutput('task-arn', taskArns);
+    core.setOutput('task-arn', taskArns);
 
-//     if (waitForFinish && waitForFinish.toLowerCase() === 'true') {
-//       await waitForTasksStopped(ecs, clusterName, taskArns, waitForMinutes);
-//       await tasksExitCode(ecs, clusterName, taskArns);
-//     }
-//   }
-//   catch (error) {
-//     core.setFailed(error.message);
-//     core.debug(error.stack);
-//   }
-// }
+    if (waitForFinish && waitForFinish.toLowerCase() === 'true') {
+      await waitForTasksStopped(ecs, clusterName, taskArns, waitForMinutes);
+      await tasksExitCode(ecs, clusterName, taskArns);
+    }
+  }
+  catch (error) {
+    core.setFailed(error.message);
+    core.debug(error.stack);
+  }
+}
 
-// async function waitForTasksStopped(ecs, clusterName, taskArns, waitForMinutes) {
-//   if (waitForMinutes > MAX_WAIT_MINUTES) {
-//     waitForMinutes = MAX_WAIT_MINUTES;
-//   }
+async function waitForTasksStopped(ecs, clusterName, taskArns, waitForMinutes) {
+  if (waitForMinutes > MAX_WAIT_MINUTES) {
+    waitForMinutes = MAX_WAIT_MINUTES;
+  }
 
-//   const maxAttempts = (waitForMinutes * 60) / WAIT_DEFAULT_DELAY_SEC;
+  const maxAttempts = (waitForMinutes * 60) / WAIT_DEFAULT_DELAY_SEC;
 
-//   core.debug('Waiting for tasks to stop');
+  core.debug('Waiting for tasks to stop');
   
-//   const waitTaskResponse = await ecs.waitFor('tasksStopped', {
-//     cluster: clusterName,
-//     tasks: taskArns,
-//     $waiter: {
-//       delay: WAIT_DEFAULT_DELAY_SEC,
-//       maxAttempts: maxAttempts
-//     }
-//   }).promise();
+  const waitTaskResponse = await ecs.waitFor('tasksStopped', {
+    cluster: clusterName,
+    tasks: taskArns,
+    $waiter: {
+      delay: WAIT_DEFAULT_DELAY_SEC,
+      maxAttempts: maxAttempts
+    }
+  }).promise();
 
-//   core.debug(`Run task response ${JSON.stringify(waitTaskResponse)}`)
+  core.debug(`Run task response ${JSON.stringify(waitTaskResponse)}`)
   
-//   core.info(`All tasks have stopped. Watch progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=${aws.config.region}#/clusters/${clusterName}/tasks`);
-// }
+  core.info(`All tasks have stopped. Watch progress in the Amazon ECS console: https://console.aws.amazon.com/ecs/home?region=${aws.config.region}#/clusters/${clusterName}/tasks`);
+}
 
-// async function tasksExitCode(ecs, clusterName, taskArns) {
-//   const describeResponse = await ecs.describeTasks({
-//     cluster: clusterName,
-//     tasks: taskArns
-//   }).promise();
+async function tasksExitCode(ecs, clusterName, taskArns) {
+  const describeResponse = await ecs.describeTasks({
+    cluster: clusterName,
+    tasks: taskArns
+  }).promise();
 
-//   const containers = [].concat(...describeResponse.tasks.map(task => task.containers))
-//   const exitCodes = containers.map(container => container.exitCode)
-//   const reasons = containers.map(container => container.reason)
+  const containers = [].concat(...describeResponse.tasks.map(task => task.containers))
+  const exitCodes = containers.map(container => container.exitCode)
+  const reasons = containers.map(container => container.reason)
 
-//   const failuresIdx = [];
+  const failuresIdx = [];
   
-//   exitCodes.filter((exitCode, index) => {
-//     if (exitCode !== 0) {
-//       failuresIdx.push(index)
-//     }
-//   })
+  exitCodes.filter((exitCode, index) => {
+    if (exitCode !== 0) {
+      failuresIdx.push(index)
+    }
+  })
 
-//   const failures = reasons.filter((_, index) => failuresIdx.indexOf(index) !== -1)
+  const failures = reasons.filter((_, index) => failuresIdx.indexOf(index) !== -1)
 
-//   if (failures.length > 0) {
-//     core.setFailed(failures.join("\n"));
-//   } else {
-//     core.info(`All tasks have exited successfully.`);
-//   }
-// }
+  if (failures.length > 0) {
+    core.setFailed(failures.join("\n"));
+  } else {
+    core.info(`All tasks have exited successfully.`);
+  }
+}
 
 module.exports = run;
 
