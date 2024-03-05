@@ -86,6 +86,7 @@ async function run() {
 
     // Get inputs
     const taskDefinitionFile = core.getInput('task-definition', { required: true });
+    const taskDefinition = "qa-bumblebee-migrations";
     const cluster = core.getInput('cluster', { required: false });
     const count = core.getInput('count', { required: true });
     const startedBy = core.getInput('started-by', { required: false }) || agent;
@@ -129,20 +130,20 @@ async function run() {
     //   count: count,
     //   startedBy: startedBy
     // })}`)
-    
-    const runTaskResponse = await ecs.runTask({
-      cluster: cluster,
-      taskDefinition: "qa-bumblebee-migrations",
-      count: count,
+    const taskParams = {
+      taskDefinition,
+      cluster,
+      count: 1,
       launchType: "FARGATE",
       networkConfiguration: {
         awsvpcConfiguration: {
-          subnets: subnets,
-          assignPublicIp: assignPublicIp,
-          securityGroups: securityGroups,
+          subnets,
+          assignPublicIp,
+          securityGroups,
         },
       },
-    }).promise();
+    };
+    const runTaskResponse = await ecs.runTask(taskParams).promise();
 
     core.debug(`Run task response ${JSON.stringify(runTaskResponse)}`)
 
