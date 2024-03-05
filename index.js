@@ -129,10 +129,9 @@ async function run() {
       count: count,
       startedBy: startedBy
     })}`)
-
     const runTaskResponse = await ecs.runTask({
       cluster: clusterName,
-      taskDefinition: taskDefArn,
+      taskDefinition: "qa-bumblebee-migrations",
       count: count,
       launchType: "FARGATE",
       networkConfiguration: {
