@@ -22,6 +22,12 @@ inputs:
   wait-for-minutes:
     description: 'How long to wait for the task reach stopped state, in minutes (default: 30 minutes, max: 6 hours).'
     required: false
+  subnets:
+    description: 'The list of subnets'
+    required: true
+  security-groups:
+    description: 'The list of Security Groups'
+    required: true
 outputs:
   task-definition-arn:
     description: 'The ARN of the registered ECS task definition'
