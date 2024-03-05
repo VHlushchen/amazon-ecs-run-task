@@ -28,6 +28,10 @@ inputs:
   security-groups:
     description: 'The list of Security Groups'
     required: true
+  assign-public-ip:
+    description: 'Assign public IP to the task. (ENABLED/DISABLED)'
+    required: false
+    default: 'ENABLED'
 outputs:
   task-definition-arn:
     description: 'The ARN of the registered ECS task definition'

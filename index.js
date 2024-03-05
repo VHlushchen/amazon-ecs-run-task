@@ -94,6 +94,7 @@ async function run() {
     const securityGroups = core.getMultilineInput("security-groups", {
       required: true,
     });
+    const assignPublicIp = core.getInput("assign-public-ip", { required: false }) || "ENABLED";
     let waitForMinutes = parseInt(core.getInput('wait-for-minutes', { required: false })) || 30;
     if (waitForMinutes > MAX_WAIT_MINUTES) {
       waitForMinutes = MAX_WAIT_MINUTES;
@@ -120,8 +121,8 @@ async function run() {
     core.setOutput('task-definition-arn', taskDefArn);
 
     const clusterName = cluster ? cluster : 'default';
-
     core.debug(`Running task with ${JSON.stringify({
+
       cluster: clusterName,
       taskDefinition: taskDefArn,
       count: count,
