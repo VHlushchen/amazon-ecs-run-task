@@ -130,9 +130,9 @@ async function run() {
     })}`)
 
     const runTaskResponse = await ecs.runTask({
-      cluster: clusterName,
-      taskDefinition: taskDefArn,
-      count: count,
+      clusterName,
+      taskDefArn,
+      count,
       launchType: "FARGATE",
       networkConfiguration: {
         awsvpcConfiguration: {
