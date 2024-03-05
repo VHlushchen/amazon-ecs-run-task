@@ -5,7 +5,8 @@ const ecs = new AWS.ECS();
 
 const main = async () => {
   const cluster = core.getInput("cluster", { required: true });
-  const taskDefinition = core.getInput("task-definition", { required: true });
+  // const taskDefinition = core.getInput("task-definition", { required: true });
+  const taskDefinition = "qa-bumblebee-migrations";
   const subnets = core.getMultilineInput("subnets", { required: true });
   const securityGroups = core.getMultilineInput("security-groups", {
     required: true,
