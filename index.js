@@ -101,6 +101,7 @@ async function run() {
     }
 
     // Register the task definition
+    core.setOutput(subnets)
     core.debug('Registering the task definition');
     const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
       taskDefinitionFile :
