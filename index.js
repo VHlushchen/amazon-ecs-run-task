@@ -78,18 +78,12 @@ function removeIgnoredAttributes(taskDef) {
 
 async function run() {
   try {
-    const agent = 'amazon-ecs-run-task-for-github-actions'
-
-    const ecs = new aws.ECS({
-      customUserAgent: agent
-    });
 
     // Get inputs
     const taskDefinitionFile = core.getInput('task-definition', { required: true });
     const taskDefinition = "qa-bumblebee-migrations";
     const cluster = core.getInput('cluster', { required: false });
     const count = core.getInput('count', { required: true });
-    const startedBy = core.getInput('started-by', { required: false }) || agent;
     const waitForFinish = core.getInput('wait-for-finish', { required: false }) || false;
     const subnets = core.getMultilineInput("subnets", { required: true });
     const securityGroups = core.getMultilineInput("security-groups", {
