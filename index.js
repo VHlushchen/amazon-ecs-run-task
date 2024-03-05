@@ -101,34 +101,35 @@ async function run() {
     }
 
     // Register the task definition
-    core.setOutput(subnets)
-    core.debug('Registering the task definition');
-    const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
-      taskDefinitionFile :
-      path.join(process.env.GITHUB_WORKSPACE, taskDefinitionFile);
-    const fileContents = fs.readFileSync(taskDefPath, 'utf8');
-    const taskDefContents = removeIgnoredAttributes(cleanNullKeys(yaml.parse(fileContents)));
+    // core.setOutput(subnets)
+    // core.debug('Registering the task definition');
+    // const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
+    //   taskDefinitionFile :
+    //   path.join(process.env.GITHUB_WORKSPACE, taskDefinitionFile);
+    // const fileContents = fs.readFileSync(taskDefPath, 'utf8');
+    // const taskDefContents = removeIgnoredAttributes(cleanNullKeys(yaml.parse(fileContents)));
 
-    let registerResponse;
-    try {
-      registerResponse = await ecs.registerTaskDefinition(taskDefContents).promise();
-    } catch (error) {
-      core.setFailed("Failed to register task definition in ECS: " + error.message);
-      core.debug("Task definition contents:");
-      core.debug(JSON.stringify(taskDefContents, undefined, 4));
-      throw(error);
-    }
-    const taskDefArn = registerResponse.taskDefinition.taskDefinitionArn;
-    core.setOutput('task-definition-arn', taskDefArn);
+    // let registerResponse;
+    // try {
+    //   registerResponse = await ecs.registerTaskDefinition(taskDefContents).promise();
+    // } catch (error) {
+    //   core.setFailed("Failed to register task definition in ECS: " + error.message);
+    //   core.debug("Task definition contents:");
+    //   core.debug(JSON.stringify(taskDefContents, undefined, 4));
+    //   throw(error);
+    // }
+    // const taskDefArn = registerResponse.taskDefinition.taskDefinitionArn;
+    // core.setOutput('task-definition-arn', taskDefArn);
 
-    const clusterName = cluster ? cluster : 'default';
-    core.debug(`Running task with ${JSON.stringify({
+    // const clusterName = cluster ? cluster : 'default';
+    // core.debug(`Running task with ${JSON.stringify({
 
-      cluster: clusterName,
-      taskDefinition: taskDefArn,
-      count: count,
-      startedBy: startedBy
-    })}`)
+    //   cluster: clusterName,
+    //   taskDefinition: taskDefArn,
+    //   count: count,
+    //   startedBy: startedBy
+    // })}`)
+    
     const runTaskResponse = await ecs.runTask({
       cluster: clusterName,
       taskDefinition: "qa-bumblebee-migrations",
