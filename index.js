@@ -133,7 +133,6 @@ async function run() {
       cluster: clusterName,
       taskDefinition: taskDefArn,
       count: count,
-      startedBy: startedBy,
       launchType: "FARGATE",
       networkConfiguration: {
         awsvpcConfiguration: {
